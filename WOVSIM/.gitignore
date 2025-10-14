@@ -25,8 +25,8 @@ obj/
 Logs/
 
 packages/
-src/.vs/
-.vs/
+src/.idea/
+.idea/
 
 .DS_Store
 .aider*
