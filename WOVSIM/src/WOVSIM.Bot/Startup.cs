@@ -71,9 +71,9 @@ namespace WOVSIM.Bot
                 .Enrich.WithMachineName()
                 .WriteTo.Console(consoleLevel)
                 .CreateLogger();
-            
+
             Log.Information("WOVSIM Bot starting up...");
-            
+
         }
 
         private void ConfigureServices(IServiceCollection services)
