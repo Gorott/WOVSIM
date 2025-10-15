@@ -1,13 +1,16 @@
 using Discord;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
+using WOVSIM.Bot.Configurations;
 using WOVSIM.Bot.Models;
 using WOVSIM.Bot.Services;
+using WOVSIM.Persistence.EntityFramework;
 
 namespace WOVSIM.Bot
 {
@@ -18,6 +21,8 @@ namespace WOVSIM.Bot
 
         public Startup(string[] args)
         {
+            BotSettings config = ConfigData.Data;
+
             IConfigurationBuilder configBuilder = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "configs"))
                 .AddJsonFile("config.json", true, true)
@@ -83,6 +88,11 @@ namespace WOVSIM.Bot
             DiscordSocketClient client = ConfigureDiscordClient();
             
             RegisterCoreServices(services, client);
+
+            services.AddDbContextFactory<WovsimDbContext>(b =>
+            {
+                b.UseNpgsql(Configuration["Database:ConnectionString"]);
+            });
         }
 
         private static DiscordSocketClient ConfigureDiscordClient()
@@ -102,7 +112,8 @@ namespace WOVSIM.Bot
         private void RegisterCoreServices(IServiceCollection services, DiscordSocketClient client)
         {
             services.AddSingleton(client)
-                .AddSingleton<StartupService>();
+                .AddSingleton<StartupService>()
+                .AddSingleton(Configuration);
         }
 
         private Task LogAsync(LogMessage log)

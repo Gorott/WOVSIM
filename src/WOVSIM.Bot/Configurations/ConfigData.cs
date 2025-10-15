@@ -20,6 +20,10 @@ public static class ConfigData
         {
             Data = new BotSettings
             {
+                Database = new DatabaseConfig
+                {
+                    ConnectionString = "Host=localhost;Port=5432;Username=postgres;Password=password;Database=fmbot;Command Timeout=60;Timeout=60;Persist Security Info=True"
+                },
                 Discord = new DiscordConfig
                 {
                     Token = "YOUR_DISCORD_BOT_TOKEN"

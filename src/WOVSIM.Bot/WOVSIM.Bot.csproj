@@ -14,6 +14,7 @@
       <PackageReference Include="Discord.Net.Interactions" Version="3.18.0" />
       <PackageReference Include="Discord.Net.Rest" Version="3.18.0" />
       <PackageReference Include="Discord.Net.Webhook" Version="3.18.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.21" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0-rc.2.25502.107" />
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0-rc.2.25502.107" />
       <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.0-rc.2.25502.107" />
@@ -29,5 +30,9 @@
       <PackageReference Include="Serilog.Sinks.Console" Version="6.0.1-dev-00953" />
       <PackageReference Include="Serilog.Sinks.Discord" Version="1.2.1" />
       <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\WOVSIM.Persistence.EntityFramework\WOVSIM.Persistence.EntityFramework.csproj" />
     </ItemGroup>
 </Project>
