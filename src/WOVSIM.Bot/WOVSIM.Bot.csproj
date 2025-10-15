@@ -14,7 +14,12 @@
       <PackageReference Include="Discord.Net.Interactions" Version="3.18.0" />
       <PackageReference Include="Discord.Net.Rest" Version="3.18.0" />
       <PackageReference Include="Discord.Net.Webhook" Version="3.18.0" />
+      <PackageReference Include="Fergun.Interactive" Version="1.9.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.21" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.21">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0-rc.2.25502.107" />
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0-rc.2.25502.107" />
       <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.0-rc.2.25502.107" />

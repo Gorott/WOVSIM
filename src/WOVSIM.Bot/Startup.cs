@@ -1,4 +1,5 @@
 using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -7,7 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
+using WOVSIM.Bot.Builders;
 using WOVSIM.Bot.Configurations;
+using WOVSIM.Bot.Handlers;
 using WOVSIM.Bot.Models;
 using WOVSIM.Bot.Services;
 using WOVSIM.Persistence.EntityFramework;
@@ -53,11 +56,13 @@ namespace WOVSIM.Bot
             
             ServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
-            IServiceProvider provider = services.BuildServiceProvider();
+            
+            ServiceProvider provider = services.BuildServiceProvider();
+            InitializeRequiredServices(provider);
             
             await provider.GetRequiredService<StartupService>().StartAsync();
             
-            await Task.Delay(-1); // Keep alive
+            await Task.Delay(-1);
         }
 
         private void ConfigureLogging()
@@ -81,6 +86,11 @@ namespace WOVSIM.Bot
 
         }
 
+        private static void InitializeRequiredServices(ServiceProvider provider)
+        {
+            provider.GetRequiredService<InteractionHandler>();
+        }
+
         private void ConfigureServices(IServiceCollection services)
         {
             services.Configure<BotSettings>(Configuration);
@@ -88,6 +98,9 @@ namespace WOVSIM.Bot
             DiscordSocketClient client = ConfigureDiscordClient();
             
             RegisterCoreServices(services, client);
+            RegisterHandlerServices(services);
+            RegisterBuilderServices(services);
+            RegisterFeatureServices(services);
 
             services.AddDbContextFactory<WovsimDbContext>(b =>
             {
@@ -112,8 +125,33 @@ namespace WOVSIM.Bot
         private void RegisterCoreServices(IServiceCollection services, DiscordSocketClient client)
         {
             services.AddSingleton(client)
+                .AddSingleton(new InteractionService(client, new InteractionServiceConfig
+                {
+                    LogLevel = LogSeverity.Info,
+                    DefaultRunMode = RunMode.Async,
+                    ThrowOnError = false
+                }))
                 .AddSingleton<StartupService>()
                 .AddSingleton(Configuration);
+        }
+
+        private static void RegisterHandlerServices(IServiceCollection services)
+        {
+            services
+                .AddSingleton<InteractionHandler>();
+        }
+
+        private static void RegisterBuilderServices(IServiceCollection services)
+        {
+            services
+                .AddSingleton<GameBuilder>();
+        }
+
+        private static void RegisterFeatureServices(IServiceCollection services)
+        {
+            services
+                .AddSingleton<GameService>()
+                .AddSingleton<UserService>();
         }
 
         private Task LogAsync(LogMessage log)
