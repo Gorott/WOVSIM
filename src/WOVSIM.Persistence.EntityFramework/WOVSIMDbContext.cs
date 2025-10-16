@@ -7,14 +7,14 @@ namespace WOVSIM.Persistence.EntityFramework
     public class WovsimDbContext : DbContext
     {
         public virtual DbSet<User> Users { get; set; }
-        
+
         public virtual DbSet<GameSession> GameSessions { get; set; }
         public virtual DbSet<Player> Players { get; set; }
-        
+
         private readonly IConfiguration _configuration;
-        
+
         public WovsimDbContext() {}
-        
+
         // public WovsimDbContext(IConfiguration configuration)
         // {
         //     _configuration = configuration;
@@ -37,22 +37,21 @@ namespace WOVSIM.Persistence.EntityFramework
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.UserId);
-                
+
                 entity.HasIndex(i => i.UserId);
-                
+
                 entity.HasIndex(i => i.DiscordUserId);
             });
             modelBuilder.Entity<GameSession>(entity =>
             {
                 entity.HasKey(e => e.GameSessionId);
 
-                entity.HasIndex(i => i.GameSessionId);
-
-                entity.HasMany(i => i.Players)
-                    .WithOne()
+                entity.HasMany(g => g.Players)
+                    .WithOne(p => p.GameSession)
+                    .HasForeignKey(p => p.GameSessionId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
-            
+
             modelBuilder.Entity<Player>(entity =>
             {
                 entity.HasKey(e => e.PlayerId);

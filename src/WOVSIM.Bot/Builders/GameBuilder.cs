@@ -1,4 +1,5 @@
 using Discord;
+using Serilog;
 using WOVSIM.Bot.Models;
 using WOVSIM.Bot.Resources;
 using WOVSIM.Bot.Services;
@@ -64,6 +65,42 @@ public class GameBuilder
     {
         bool joinButtonDisabled = game.Players.Count >= 16 && game.Status != GameStatus.WaitingForPlayers;
         return new ComponentBuilder()
-            .WithButton("Join", $"join-{game.GameSessionId}", ButtonStyle.Primary, disabled: joinButtonDisabled);
+            .WithButton("Join", $"{InteractionConstants.Game.JoinGame}-{game.GameSessionId}", disabled: joinButtonDisabled);
+    }
+
+    public async Task<ResponseModel> JoinGame(ContextModel context, int gameSessionId)
+    {
+        ResponseModel response = new ResponseModel
+        {
+            ResponseType = ResponseType.Embed
+        };
+        
+        GameSession game = await _gameService.GetGameSessionForSessionId(gameSessionId);
+        
+        if (game == null)
+        {
+            response.ResponseType = ResponseType.Text;
+            response.CommandResponse = CommandResponse.Error;
+            response.Text = "Sorry, this game does not exist.";
+            return response;
+        }
+
+        var userId = context.UserContext.UserId;
+
+        if (game.Players.Any(p => p.UserId == userId))
+        {
+            response.ResponseType = ResponseType.Text;
+            response.CommandResponse = CommandResponse.Error;
+            response.Text = "You are already in this game.";
+            return response;
+        }
+        
+        await _gameService.AddPlayerToGame(context, gameSessionId);
+            
+        
+        await BuildGameInformationEmbed(response.Embed, game);
+        response.Components = BuildGameInformationComponents(game);
+
+        return response;
     }
 }

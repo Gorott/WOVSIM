@@ -34,6 +34,7 @@ public class StartupService
         _interactionService = interactionService;
         _interactions = interactions;
         _settings = settings.Value;
+        
     }
 
     public async Task StartAsync()
@@ -65,10 +66,14 @@ public class StartupService
         await _client.SetStatusAsync(UserStatus.DoNotDisturb);
         
         Log.Information("Loading interaction modules");
-        await _interactions.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
+        var modules = await _interactions.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
+        Log.Information("Loaded {Count} modules", modules.Count());
+
+
         
         Log.Information("Starting Discord client");
         await _client.StartAsync();
+
         
         Log.Information("Waiting until client is connected");
         while (_client.ConnectionState != ConnectionState.Connected)
@@ -80,7 +85,7 @@ public class StartupService
         await RegisterSlashCommands();
     }
 
-    public async Task RegisterSlashCommands()
+    private async Task RegisterSlashCommands()
     {
         Log.Information("Starting slash command registration");
         

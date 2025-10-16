@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Fergun.Interactive;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -20,7 +21,6 @@ namespace WOVSIM.Bot
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        private readonly DiscordSocketClient _client;
 
         public Startup(string[] args)
         {
@@ -32,16 +32,6 @@ namespace WOVSIM.Bot
                 .AddEnvironmentVariables();
             
             Configuration = configBuilder.Build();
-
-            // Configure Discord client
-            _client = new DiscordSocketClient(new DiscordSocketConfig
-            {
-                LogLevel = LogSeverity.Info,
-                GatewayIntents = GatewayIntents.AllUnprivileged |
-                                 GatewayIntents.MessageContent
-            });
-
-            _client.Log += LogAsync;
         }
 
         public static async Task RunAsync(string[] args)
@@ -152,14 +142,13 @@ namespace WOVSIM.Bot
             services
                 .AddSingleton<GameService>()
                 .AddSingleton<UserService>();
-        }
 
-        private Task LogAsync(LogMessage log)
-        {
-            Console.WriteLine($"[{log.Severity}] {log.Source}: {log.Message}");
-            if (log.Exception != null)
-                Console.WriteLine(log.Exception);
-            return Task.CompletedTask;
+            services.AddSingleton(new InteractiveConfig
+                {
+                    ReturnAfterSendingPaginator = true,
+                    ProcessSinglePagePaginators = true
+                })
+                .AddSingleton<InteractiveService>();
         }
     }
 }

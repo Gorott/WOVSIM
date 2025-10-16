@@ -2,6 +2,7 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Serilog;
+using Serilog.Core;
 using WOVSIM.Bot.Services;
 using WOVSIM.Persistence.Domain.Models;
 
@@ -26,16 +27,24 @@ public class InteractionHandler
         _provider = provider;
         _userService = userService;
         _client.SlashCommandExecuted += SlashCommandExecuted;
+        _client.ButtonExecuted += ButtonExecuted;
+        
     }
 
     private async Task SlashCommandExecuted(SocketInteraction socketInteraction)
     {
+        _interactionService.Log += msg =>
+        {
+            Console.WriteLine($"[InteractionService] {msg}");
+            return Task.CompletedTask;
+        };
+
         if (socketInteraction is not SocketSlashCommand socketSlashCommand)
         {
             return;
         }
 
-        _ = Task.Run(() => ExecuteSlashCommand(socketInteraction, socketSlashCommand));
+        await ExecuteSlashCommand(socketInteraction, socketSlashCommand);
     }
     
     private async Task ExecuteSlashCommand(SocketInteraction socketInteraction, SocketSlashCommand socketSlashCommand)
@@ -54,6 +63,19 @@ public class InteractionHandler
         ICommandInfo command = commandSearch.Command;
         
         if (!await CommandEnabled(context, command))
+        {
+            return;
+        }
+
+        await _interactionService.ExecuteCommandAsync(context, _provider);
+    }
+
+    private async Task ButtonExecuted(SocketMessageComponent socketMessageComponent)
+    {
+        SocketInteractionContext context = new SocketInteractionContext(_client, socketMessageComponent);
+        SearchResult<ComponentCommandInfo> commandSearch = _interactionService.SearchComponentCommand(socketMessageComponent);
+        
+        if (!commandSearch.IsSuccess)
         {
             return;
         }

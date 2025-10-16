@@ -35,4 +35,6 @@ public class ResponseModel
     
     public ComponentPaginatorBuilder ComponentPaginator { get; set; }
     
+    public CommandResponse CommandResponse { get; set; }
+    
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using WOVSIM.Bot.Models;
 using WOVSIM.Domain.Enums;
 using WOVSIM.Persistence.Domain.Models;
@@ -55,16 +56,17 @@ public class GameService
     {
         await using WovsimDbContext db = await _contextFactory.CreateDbContextAsync();
         return await db.GameSessions
-            .FirstOrDefaultAsync(g =>
-                g.GameSessionId == gameSessionId &&
-                (g.Status == GameStatus.InProgress || g.Status == GameStatus.WaitingForPlayers));
+            .Include(g => g.Players)
+            .FirstOrDefaultAsync(g => g.GameSessionId == gameSessionId);
+
     }
 
     public async Task<GameSession> GetGameSessionForGuildId(ulong guildId)
     {
         await using WovsimDbContext db = await _contextFactory.CreateDbContextAsync();
         return db.GameSessions
-            .FirstOrDefault(g => g.DiscordGuildId == guildId && (g.Status == GameStatus.InProgress || g.Status == GameStatus.WaitingForPlayers));
+            .Include(g => g.Players)
+            .FirstOrDefault(g => g.DiscordGuildId == guildId);
     }
 
     public async Task AddResponseId(int gameSessionId, ulong responseId)
@@ -78,4 +80,25 @@ public class GameService
         db.Update(game);
         await db.SaveChangesAsync();
     }
+    
+    public async Task AddPlayerToGame(ContextModel context, int gameSessionId)
+    {
+        await using var db = await _contextFactory.CreateDbContextAsync();
+
+        var game = await db.GameSessions
+            .Include(g => g.Players)
+            .FirstOrDefaultAsync(g => g.GameSessionId == gameSessionId);
+
+        
+        var userId = context.UserContext.UserId;
+
+        var player = new Player
+        {
+            UserId = userId
+        };
+
+        game.Players.Add(player);
+        await db.SaveChangesAsync();
+    }
+
 }
