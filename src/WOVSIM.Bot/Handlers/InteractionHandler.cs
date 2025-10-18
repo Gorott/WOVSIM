@@ -33,11 +33,6 @@ public class InteractionHandler
 
     private async Task SlashCommandExecuted(SocketInteraction socketInteraction)
     {
-        _interactionService.Log += msg =>
-        {
-            Console.WriteLine($"[InteractionService] {msg}");
-            return Task.CompletedTask;
-        };
 
         if (socketInteraction is not SocketSlashCommand socketSlashCommand)
         {
@@ -83,8 +78,8 @@ public class InteractionHandler
         await _interactionService.ExecuteCommandAsync(context, _provider);
     }
 
-    private static async Task<bool> CommandEnabled(SocketInteractionContext context, ICommandInfo command)
+    private static Task<bool> CommandEnabled(SocketInteractionContext context, ICommandInfo command)
     {
-        return true;
+        return Task.FromResult(true);
     }
 }

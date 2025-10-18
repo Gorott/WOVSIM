@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
 using WOVSIM.Bot.Models;
+using WOVSIM.Persistence.Domain.Models;
 using WOVSIM.Persistence.EntityFramework;
 
 namespace WOVSIM.Bot.Services;
@@ -50,6 +51,7 @@ public class StartupService
             Log.Error(e, "Something went wrong while creating/updating the database!");
             throw;
         }
+
 
         Log.Information("Starting bot...");
         

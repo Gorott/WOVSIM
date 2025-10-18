@@ -127,7 +127,6 @@ public static class InteractionContextExtensions
     public static async Task UpdateInteractionEmbed(this IInteractionContext context, ResponseModel response, InteractiveService interactiveService = null, bool defer = true)
     {
         var message = (context.Interaction as SocketMessageComponent)?.Message;
-
         if (message == null)
         {
             return;
@@ -139,6 +138,11 @@ public static class InteractionContextExtensions
     public static async Task ModifyMessage(this IInteractionContext context, IUserMessage message,
         ResponseModel response, bool defer = true, bool interactionEdit = false)
     {
+        if (defer)
+        {
+            await context.Interaction.DeferAsync();
+        }
+        
         await message.ModifyAsync(m =>
         {
             m.Components = response.ResponseType == ResponseType.ComponentsV2
@@ -147,11 +151,6 @@ public static class InteractionContextExtensions
             m.Embed = response.ResponseType == ResponseType.ComponentsV2 ? null : response.Embed?.Build();
             m.AllowedMentions = AllowedMentions.None;
         });
-
-        if (defer)
-        {
-            await context.Interaction.DeferAsync();
-        }
     }
 
     public static string GenerateRandomCode()

@@ -37,4 +37,14 @@ public class ResponseModel
     
     public CommandResponse CommandResponse { get; set; }
     
+    public static ResponseModel TextError(string message)
+    {
+        return new ResponseModel()
+        {
+            CommandResponse = CommandResponse.Error,
+            ResponseType = ResponseType.Text,
+            Text = message
+        };
+    }
+    
 }

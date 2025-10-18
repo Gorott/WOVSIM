@@ -55,8 +55,14 @@ public class GameSlashCommand : InteractionModuleBase<SocketInteractionContext>
         await DeferAsync();
         User user = await _userService.GetUserAsync(Context.User);
         ContextModel context = new ContextModel(Context, user);
-        ResponseModel response = await _gameBuilder.CreateGame(context, user.UserId, name);
+        ResponseModel response = await _gameBuilder.CreateGame(context, name);
 
+        if (response.CommandResponse == CommandResponse.Error)
+        {
+            await Context.SendFollowUpResponse(Interactivity, response);
+            return;
+        }
+        
         var responseId = await Context.SendFollowUpResponse(Interactivity, response);
 
         if (responseId.HasValue && response.GameSessionId.HasValue)

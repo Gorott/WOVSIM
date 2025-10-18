@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using WOVSIM.Domain.Enums;
 
 namespace WOVSIM.Persistence.Domain.Models;
 
 public class GameSession
 {
+    [Key]
     public int GameSessionId { get; set; }
     public int StarterUserId { get; set; }
     
