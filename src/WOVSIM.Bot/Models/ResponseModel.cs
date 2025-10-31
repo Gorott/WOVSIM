@@ -25,13 +25,17 @@ public class ResponseModel
     
     public string Text { get; set; }
     public int? GameSessionId { get; set; }
-    
+
     
     public ComponentBuilderV2 ComponentsV2 { get; set; }
     public ContainerBuilder ComponentsContainer { get; set; }
     
     
     public ResponseType ResponseType { get; set; }
+    
+        
+    public Stream? Stream { get; set; }
+    public string? FileName { get; set; }
     
     public ComponentPaginatorBuilder ComponentPaginator { get; set; }
     

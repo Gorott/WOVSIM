@@ -14,6 +14,8 @@ using WOVSIM.Bot.Configurations;
 using WOVSIM.Bot.Handlers;
 using WOVSIM.Bot.Models;
 using WOVSIM.Bot.Services;
+using WOVSIM.CodeRunner.Interfaces;
+using WOVSIM.CodeRunner.Services;
 using WOVSIM.Persistence.EntityFramework;
 
 namespace WOVSIM.Bot
@@ -134,14 +136,19 @@ namespace WOVSIM.Bot
         private static void RegisterBuilderServices(IServiceCollection services)
         {
             services
-                .AddSingleton<GameBuilder>();
+                .AddSingleton<GameBuilder>()
+                .AddSingleton<ChallengeBuilder>();
         }
 
         private static void RegisterFeatureServices(IServiceCollection services)
         {
             services
+                .AddHttpClient<ICodeRunnerService, CodeRunnerService>();
+            
+            services
                 .AddSingleton<GameService>()
-                .AddSingleton<UserService>();
+                .AddSingleton<UserService>()
+                .AddSingleton<ICodeRunnerService, CodeRunnerService>();
 
             services.AddSingleton(new InteractiveConfig
                 {
